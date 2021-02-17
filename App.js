@@ -1,20 +1,39 @@
 import { StatusBar } from "expo-status-bar";
-import React, {useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { StyleSheet, Text, TextInput, View } from "react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome5";
-import { AppProvider } from "./utils/AppContext";
-import AppContext,{ AppProvider } from "./utils/AppContext.js";
+// import { AppProvider } from "./utils/AppContext";
+const weatherAPI_KEY = "627eb6dbd4fbb7bf1e2154cb0804d4f7";
+const baseWeatherUrl = "https://api.openweathermap.org/data/2.5/weather?";
+const zipCode = "40383";
 
 export default function App() {
-  const context = useContext(AppContext);
-  const [zipCode, setZipCode] = useState("");
-  function validateZipCode(context.zipCode) {
-    let zipCodeAlgo = /^\d{5}$|^\d{5}-\d{4}$/;
-    return zipCodeAlgo.test(context.zipCode)
-}
-  return (
-    <AppProvider>
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [currentWeather, setCurrentWeather] = useState(null)
+  useEffect(() => {
+    load();
+  }, []);
+  async function load() {
+    try {
+      const weatherUrl = `${baseWeatherUrl}zip=${zipCode}&appid=${weatherAPI_KEY}`;
 
+      const response = await fetch(weatherUrl);
+      const result = await response.json();
+      if (response.ok){
+        setCurrentWeather(result)
+      }
+      else{
+        setErrorMessage(result.message)
+      }
+    } catch (error) {}
+  }
+  if(currentWeather){
+    console.log(currentWeather);
+    const { main: { temp }} = currentWeather; 
+  
+  // openweatherAPI key 01e9afe20f47e07d2cd75f9f6d962bf8
+  return (
+    <>
     <View style={styles.container}>
       <View style={styles.searchBar}>
         <View style={styles.searchInput}>
@@ -40,8 +59,22 @@ export default function App() {
       </View>
       <StatusBar style="auto" />
     </View>
-    </AppProvider>
-  );
+    <View style={styles.searchBar}>
+      <Text>{temp}</Text>
+    </View>
+    </>
+  )} else{
+    return(
+      <View style={styles.container}>
+      <Text>{errorMessage}</Text>
+      <StatusBar style="auto"></StatusBar>
+
+      </View>
+
+    ) 
+  }
+
+  
 }
 
 const styles = StyleSheet.create({
@@ -49,6 +82,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     alignItems: "center",
+    justifyContent: "center",
   },
   searchBar: {
     backgroundColor: "#1976d2",
@@ -68,16 +102,16 @@ const styles = StyleSheet.create({
   Tabs: {},
   input: {
     flexGrow: 1,
-    marginLeft:10,
-    marginRight:10,
-    fontSize:15,
-    border:'none',
+    marginLeft: 10,
+    marginRight: 10,
+    fontSize: 15,
+    border: "none",
   },
-  icon:{
-    width:25,
-    height:25,
-    display:'flex',
-    alignItems:'center',
-    justifyContent:'center'
-  }
+  icon: {
+    width: 25,
+    height: 25,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
 });
