@@ -1,10 +1,20 @@
 import { StatusBar } from "expo-status-bar";
-import React from "react";
+import React, {useEffect, useState, useContext } from "react";
 import { StyleSheet, Text, TextInput, View } from "react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome5";
+import { AppProvider } from "./utils/AppContext";
+import AppContext,{ AppProvider } from "./utils/AppContext.js";
 
 export default function App() {
+  const context = useContext(AppContext);
+  const [zipCode, setZipCode] = useState("");
+  function validateZipCode(context.zipCode) {
+    let zipCodeAlgo = /^\d{5}$|^\d{5}-\d{4}$/;
+    return zipCodeAlgo.test(context.zipCode)
+}
   return (
+    <AppProvider>
+
     <View style={styles.container}>
       <View style={styles.searchBar}>
         <View style={styles.searchInput}>
@@ -30,6 +40,7 @@ export default function App() {
       </View>
       <StatusBar style="auto" />
     </View>
+    </AppProvider>
   );
 }
 
